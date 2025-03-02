@@ -1,54 +1,54 @@
 function updateTime() {
-  // Johannesburg
-  let johannesburgElement = document.querySelector("#johannesburg");
-  if (johannesburgElement) {
-    let johannesburgDateElement = johannesburgElement.querySelector(".date");
-    let johannesburgTimeElement = johannesburgElement.querySelector(".time");
-    let johannesburgTime = moment().tz("Africa/Johannesburg");
-
-    johannesburgDateElement.innerHTML = johannesburgTime.format("MMMM Do YYYY");
-    johannesburgTimeElement.innerHTML = johannesburgTime.format(
-      "h:mm:ss [<small>]A[</small>]"
-    );
+  // Ensure the Moment Timezone library is working
+  if (typeof moment === "undefined" || typeof moment.tz === "undefined") {
+    console.error("Moment Timezone is not properly loaded.");
+    return;
   }
 
-  // Lagos
-  let lagosElement = document.querySelector("#lagos");
-  if (lagosElement) {
-    let lagosDateElement = lagosElement.querySelector(".date");
-    let lagosTimeElement = lagosElement.querySelector(".time");
-    let lagosTime = moment().tz("Africa/Lagos");
+  // Get all cities in the DOM and update their time
+  let cities = document.querySelectorAll(".city");
+  cities.forEach((cityElement) => {
+    let timeZone = cityElement.getAttribute("data-timezone");
+    let cityTime = moment().tz(timeZone);
 
-    lagosDateElement.innerHTML = lagosTime.format("MMMM Do YYYY");
-    lagosTimeElement.innerHTML = lagosTime.format(
-      "h:mm:ss [<small>]A[</small>]"
-    );
-  }
+    let dateElement = cityElement.querySelector(".date");
+    let timeElement = cityElement.querySelector(".time");
+
+    // Update the date and time for each city
+    dateElement.innerHTML = cityTime.format("MMMM Do YYYY");
+    timeElement.innerHTML = cityTime.format("h:mm:ss [<small>]A[</small>]");
+  });
 }
 
 function updateCity(event) {
   let cityTimeZone = event.target.value;
+  if (cityTimeZone === "current") {
+  }
+  cityTimeZone = moment.tz.guess();
   if (!cityTimeZone) return;
 
-  let cityName = cityTimeZone.replace("_", " ").split("/")[1];
+  // Extract city name and time from the selected timezone
+  let cityName = cityTimeZone.split("/")[1].replace("_", " ");
   let cityTime = moment().tz(cityTimeZone);
+
   let citiesElement = document.querySelector("#cities");
 
+  // Clear the existing cities to show only the selected one
   citiesElement.innerHTML = `
-  <div class="city">
-    <div>
-      <h2>${cityName}</h2>
-      <div class="date">${cityTime.format("MMMM Do YYYY")}</div>
+    <div class="city" data-timezone="${cityTimeZone}">
+        <h2>${cityName}</h2>
+        <div class="date">${cityTime.format("MMMM Do YYYY")}</div>
+        <div class="time">${cityTime.format(
+          "h:mm:ss [<small>]A[</small>]"
+        )}</div>
     </div>
-    <div class="time">${cityTime.format("h:mm:ss")} <small>${cityTime.format(
-    "A"
-  )}</small></div>
-  </div>
   `;
 }
 
+// Initial time update and refresh every second
 updateTime();
 setInterval(updateTime, 1000);
 
+// Listen for city selection change
 let citiesSelectElement = document.querySelector("#city");
 citiesSelectElement.addEventListener("change", updateCity);
