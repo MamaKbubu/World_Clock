@@ -1,3 +1,4 @@
+// Function to update the time for all cities
 function updateTime() {
   // Ensure the Moment Timezone library is working
   if (typeof moment === "undefined" || typeof moment.tz === "undefined") {
@@ -20,11 +21,12 @@ function updateTime() {
   });
 }
 
+// Function to update the time for a selected city
 function updateCity(event) {
   let cityTimeZone = event.target.value;
   if (cityTimeZone === "current") {
+    cityTimeZone = moment.tz.guess(); // Get user's local timezone
   }
-  cityTimeZone = moment.tz.guess();
   if (!cityTimeZone) return;
 
   // Extract city name and time from the selected timezone
@@ -45,6 +47,41 @@ function updateCity(event) {
   `;
 }
 
+// Function to reset the page to show all cities
+function resetPage() {
+  let citiesElement = document.querySelector("#cities");
+
+  citiesElement.innerHTML = `
+    <div class="city" data-timezone="Africa/Johannesburg">
+        <h2>Johannesburg</h2>
+        <div class="date"></div>
+        <div class="time"></div>
+    </div>
+    <div class="city" data-timezone="Africa/Lagos">
+        <h2>Lagos</h2>
+        <div class="date"></div>
+        <div class="time"></div>
+    </div>
+    <div class="city" data-timezone="America/New_York">
+        <h2>New York</h2>
+        <div class="date"></div>
+        <div class="time"></div>
+    </div>
+    <div class="city" data-timezone="Europe/London">
+        <h2>London</h2>
+        <div class="date"></div>
+        <div class="time"></div>
+    </div>
+    <div class="city" data-timezone="Asia/Tokyo">
+        <h2>Tokyo</h2>
+        <div class="date"></div>
+        <div class="time"></div>
+    </div>
+  `;
+  // Re-trigger the time update for all cities
+  updateTime();
+}
+
 // Initial time update and refresh every second
 updateTime();
 setInterval(updateTime, 1000);
@@ -52,3 +89,10 @@ setInterval(updateTime, 1000);
 // Listen for city selection change
 let citiesSelectElement = document.querySelector("#city");
 citiesSelectElement.addEventListener("change", updateCity);
+
+// Listen for the "All Cities" link to reset the page
+let allCitiesLink = document.querySelector("#allCitiesLink");
+allCitiesLink.addEventListener("click", function (event) {
+  event.preventDefault(); // Prevent the default link behavior
+  resetPage(); // Reset to show all cities
+});
